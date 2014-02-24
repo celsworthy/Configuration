@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+        <action>
+            <actionName>CUSTOM-Maven Deploy</actionName>
+            <displayName>Maven Deploy</displayName>
+            <goals>
+                <goal>mvn</goal>
+                <goal>deploy:deploy</goal>
+            </goals>
+            <activatedProfiles>
+                <activatedProfile>artifactory</activatedProfile>
+            </activatedProfiles>
+        </action>
+        <action>
+            <actionName>CUSTOM-deploy</actionName>
+            <displayName>deploy</displayName>
+            <goals>
+                <goal>deploy</goal>
+            </goals>
+        </action>
+    </actions>
