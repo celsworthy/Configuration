@@ -1,2 +1,2 @@
-. ~/setupmaven.sh
+. /home/ubuntu/setupmaven.sh
 mvn install
