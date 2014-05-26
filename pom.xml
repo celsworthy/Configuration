@@ -83,6 +83,7 @@
                         <!-- You can also customize your tag prefixes -->
                         <versionTagPrefix></versionTagPrefix>
                     </flowInitContext>
+                    <allowUntracked>true</allowUntracked>
                 </configuration>
             </plugin>
         </plugins>
