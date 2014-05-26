@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package libertysystems.configuration;
 
 import java.io.File;
@@ -17,7 +13,7 @@ import org.apache.commons.configuration.tree.xpath.XPathExpressionEngine;
 /**
  *
  * @author Ian Hudson
- * @ Liberty Systems Limited
+ * Liberty Systems Limited
  */
 public class Configuration
 {
