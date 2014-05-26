@@ -24,6 +24,7 @@
     </dependencies>
     <distributionManagement>
         <repository>
+            <id>celtechRepo</id>
             <name>CEL Tech Repository</name>
             <url>http://54.229.31.30:8080/artifactory</url>
         </repository>
@@ -68,7 +69,7 @@
                       Prevents deployments from dev workstations so that they can be done by a CI
                       server
                     -->
-                    <noDeploy>true</noDeploy>
+                    <noDeploy>false</noDeploy>
                     <flowInitContext>
                         <!--
                           You can customize your development branch name. Why? Because it's faster to type
