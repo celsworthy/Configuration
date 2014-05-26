@@ -24,10 +24,8 @@
     </dependencies>
     <distributionManagement>
         <repository>
-            <snapshots />
-            <id>snapshots</id>
-            <name>libs-snapshot-local</name>
-            <url>http://54.229.31.30:8080/artifactory/libs-snapshot-local</url>
+            <name>CEL Tech Repository</name>
+            <url>http://54.229.31.30:8080/artifactory</url>
         </repository>
     </distributionManagement>
     <name>Configuration</name>
