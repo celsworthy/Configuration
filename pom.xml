@@ -81,7 +81,7 @@
                         -->
                         <developBranchName>develop</developBranchName>
                         <!-- You can also customize your tag prefixes -->
-                        <versionTagPrefix></versionTagPrefix>
+                        <versionTagPrefix />
                     </flowInitContext>
                     <allowUntracked>true</allowUntracked>
                 </configuration>
