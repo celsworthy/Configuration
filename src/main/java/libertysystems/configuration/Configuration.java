@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
@@ -162,8 +164,8 @@ public class Configuration
             }
 
             //Deal with the user's home directory...
-            configValue = configValue.replaceAll(userHomeReference, userHomeDirectory);
-            configValue = configValue.replaceAll(appdataReference, appdataDirectory);
+            configValue = configValue.replaceAll(userHomeReference, Matcher.quoteReplacement(userHomeDirectory));
+            configValue = configValue.replaceAll(appdataReference, Matcher.quoteReplacement(appdataDirectory));
         }
 
         return configValue;
