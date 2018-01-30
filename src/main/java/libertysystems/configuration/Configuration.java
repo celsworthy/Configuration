@@ -59,17 +59,24 @@ public class Configuration
         appdataDirectory = appdataDirectory.replaceAll("\\\\", "/");
 
         configFileName = System.getProperty(configFilePropertyName);
-        try
+        if (configFileName != null && configFileName.equalsIgnoreCase("$test$"))
         {
-            config = new XMLConfiguration(configFileName);
-            config.setExpressionEngine(new XPathExpressionEngine());
-            configLoaded = true;
+            System.out.println("Test mode - no configuration loaded.");
+        }
+        else
+        {
+            try
+            {
+                config = new XMLConfiguration(configFileName);
+                config.setExpressionEngine(new XPathExpressionEngine());
+                configLoaded = true;
 
-        } catch (ConfigurationException ex)
-        {
-            // Can't use stenographer as this would give us a circular dependency
-            System.err.println(">>>> ERROR loading system config (using -D" + configFilePropertyName + ") " + ex);
-            throw new ConfigNotLoadedException(">>>> ERROR loading system config (using -D" + configFilePropertyName + ") " + ex.getMessage());
+            } catch (ConfigurationException ex)
+            {
+                // Can't use stenographer as this would give us a circular dependency
+                System.err.println(">>>> ERROR loading system config (using -D" + configFilePropertyName + ") " + ex);
+                throw new ConfigNotLoadedException(">>>> ERROR loading system config (using -D" + configFilePropertyName + ") " + ex.getMessage());
+            }
         }
     }
 
@@ -102,7 +109,8 @@ public class Configuration
 
             returnVal = replaceReferences(componentName, rawConfigValue);
 
-        } else
+        }
+        else
         {
             throw new ConfigNotLoadedException("System configuration unavailable");
         }
@@ -192,7 +200,12 @@ public class Configuration
             {
                 returnval = defaultValue;
             }
-        } else
+        } else if (configFileName != null && configFileName.equalsIgnoreCase("$test$"))
+        {
+            // Test mode
+            returnval = defaultValue;
+        }
+        else
         {
             throw new ConfigNotLoadedException("System configuration unavailable");
         }
