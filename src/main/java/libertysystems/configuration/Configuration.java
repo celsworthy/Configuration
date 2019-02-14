@@ -1,6 +1,10 @@
 package libertysystems.configuration;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -48,7 +52,17 @@ public class Configuration
         if (System.getProperty("os.name").startsWith("Windows"))
         {
             appdataDirectory = System.getenv("APPDATA");
-            userHomeDirectory = System.getProperty("user.home") + File.separator + "My Documents";
+            String registryValue = WindowsRegistry.currentUser("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders", "Personal");
+            if (registryValue != null)
+            {
+                Path regPath = Paths.get(registryValue);
+                if (Files.exists(regPath, LinkOption.NOFOLLOW_LINKS))
+                {
+                    userHomeDirectory = registryValue;
+                }
+            }
+            if (userHomeDirectory == null)
+                userHomeDirectory = System.getProperty("user.home");
         } else
         {
             appdataDirectory = System.getProperty("user.home");
