@@ -5,124 +5,81 @@
  */
 package libertysystems.configuration;
 
-import java.lang.reflect.Method;
-import java.util.prefs.Preferences;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class WindowsRegistry
 {
-
-    private static final int KEY_READ = 0x20019;
-
-    public static void currentMachine(String key)
+    public static String currentUser(String key, String valueKey)
     {
-        //Retrieve a reference to the root of the system preferences tree
-        final Preferences systemRoot = Preferences.systemRoot();
-        final Class clz = systemRoot.getClass();
-
-        try
-        {
-            Class[] params1 =
-            {
-                byte[].class, int.class, int.class
-            };
-            final Method openKey = clz.getDeclaredMethod(
-                    "openKey", params1);
-            openKey.setAccessible(true);
-
-            Class[] params2 =
-            {
-                int.class
-            };
-            final Method closeKey = clz.getDeclaredMethod(
-                    "closeKey", params2);
-            closeKey.setAccessible(true);
-
-            final Method winRegQueryValue = clz.getDeclaredMethod(
-                    "WindowsRegQueryValueEx",
-                    int.class,
-                    byte[].class);
-            winRegQueryValue.setAccessible(true);
-
-//            String key = "SOFTWARE\\Microsoft\\Internet Explorer";
-            int hKey = (Integer) openKey.invoke(systemRoot,
-                    toByteEncodedString(key),
-                    KEY_READ,
-                    KEY_READ);
-            byte[] valb = (byte[]) winRegQueryValue.invoke(systemRoot, hKey,
-                    toByteEncodedString("Version"));
-            String vals = (valb != null ? new String(valb).trim() : null);
-            System.out.println("Internet Explorer Version = " + vals);
-            closeKey.invoke(Preferences.systemRoot(), hKey);
-
-        } catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+        // Hacky reflection method of accessing the Windows Registry stopped working
+        // in Java 9. For the moment, we have to use the Windows system program reg
+        // to read the registry.
+        return readRegistry("HKCU\\" + key, valueKey);
     }
 
-    public static String currentUser(String key, String value)
+    public static String readRegistry(String location, String key)
     {
-        //Retrieve a reference to the root of the user preferences tree
-        final Preferences userRoot = Preferences.userRoot();
-        final Class clz = userRoot.getClass();
-        String vals = null;
-
         try
         {
-            Class[] params1 =
+            // Run reg query, then read output with StreamReader (internal class)
+            Process process = Runtime.getRuntime().exec("reg query " + 
+                    '"'+ location + "\" /v " + key);
+
+            InputStream is = process.getInputStream();
+            StringBuilder sw = new StringBuilder();
+
+            try
             {
-                byte[].class, int.class, int.class
-            };
-            final Method openKey = clz.getDeclaredMethod("openKey",
-                    params1);
-            openKey.setAccessible(true);
+               int c;
+               while ((c = is.read()) != -1)
+                   sw.append((char)c);
+            }
+            catch (IOException e)
+            { 
+            }
 
-            Class[] params2 =
+            String output = sw.toString();
+
+            // Output has the following format:
+            // \n<Version information>\n\n<key>    <registry type>    <value>\r\n\r\n
+            int i = output.indexOf("REG_SZ");
+            if (i == -1)
             {
-                int.class
-            };
-            final Method closeKey = clz.getDeclaredMethod("closeKey",
-                    params2);
-            closeKey.setAccessible(true);
+                return null;
+            }
 
-            final Method winRegQueryValue = clz.getDeclaredMethod(
-                    "WindowsRegQueryValueEx",
-                    int.class,
-                    byte[].class);
-            winRegQueryValue.setAccessible(true);
+            sw = new StringBuilder();
+            i += 6; // skip REG_SZ
 
-            int hKey = (Integer) openKey.invoke(userRoot,
-                    toByteEncodedString(key),
-                    KEY_READ,
-                    KEY_READ);
+            // skip spaces or tabs
+            for (;;)
+            {
+               if (i > output.length())
+                   break;
+               char c = output.charAt(i);
+               if (c != ' ' && c != '\t')
+                   break;
+               ++i;
+            }
 
-            byte[] valb = (byte[]) winRegQueryValue.invoke(
-                    userRoot,
-                    hKey,
-                    toByteEncodedString(
-                            value));
+            // take everything until end of line
+            for (;;)
+            {
+               if (i > output.length())
+                   break;
+               char c = output.charAt(i);
+               if (c == '\r' || c == '\n')
+                   break;
+               sw.append(c);
+               ++i;
+            }
 
-            vals = (valb != null ? new String(valb).trim() : null);
-//            System.out.println("MimeExclusionListForCache = " + vals);
-            closeKey.invoke(Preferences.userRoot(), hKey);
-
-        } catch (Exception e)
-        {
-            e.printStackTrace();
+            return sw.toString();
         }
-
-        return vals;
-    }
-
-    private static byte[] toByteEncodedString(String str)
-    {
-
-        byte[] result = new byte[str.length() + 1];
-        for (int i = 0; i < str.length(); i++)
+        catch (Exception e)
         {
-            result[i] = (byte) str.charAt(i);
+            return null;
         }
-        result[str.length()] = 0;
-        return result;
     }
 }
