@@ -69,8 +69,11 @@ public class Configuration
             userHomeDirectory = appdataDirectory;
         }
 
-        userHomeDirectory = userHomeDirectory.replaceAll("\\\\", "/");
-        appdataDirectory = appdataDirectory.replaceAll("\\\\", "/");
+        // The following two lines were removed as there was no comment explaining why
+        // they were needed, and it stops network directories (which start with a double backslash)
+        // from being used on Windows.
+        //userHomeDirectory = userHomeDirectory.replaceAll("\\\\", "/");
+        //appdataDirectory = appdataDirectory.replaceAll("\\\\", "/");
 
         configFileName = System.getProperty(configFilePropertyName);
         try
